@@ -15,8 +15,8 @@ Mangue (https://github.com/rntgspr/mangue) is a GUI app shipped as a DMG, so it 
 
 ```ruby
 cask "mangue" do
-  version "0.1.0"
-  sha256 "48d2bfd0707b405f93234c8bbbedc247153a1d94e8ef5cd987b1c4e795aeb068"
+  version "0.1.1"
+  sha256 "d28e7b18e8ee5417d92c10e249fad4057406f632dea146bbcd4abe01aa64a176"
 
   url "https://github.com/rntgspr/mangue/releases/download/v#{version}/Mangue-#{version}.dmg"
   name "Mangue"
@@ -42,7 +42,7 @@ cask "mangue" do
 end
 ```
 
-Verified on a throwaway tap: `brew style` clean, `brew audit --cask --strict` clean, install/uninstall OK. `brew audit --cask --online` currently fails only because v0.1.0 is a GitHub **pre-release** (`releases/latest` 404); it passes once a non-pre-release exists.
+Verified on a throwaway tap against v0.1.1 (published as latest): `brew style` no offenses, `brew audit --cask --online --strict` no findings, `brew livecheck` resolves `0.1.1 ==> 0.1.1`; earlier offline audit and install/uninstall OK.
 
 ## 2. Tap README section
 
