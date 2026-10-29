@@ -120,6 +120,9 @@ jobs:
         with:
           path: dist
           merge-multiple: true
+      - name: Write SHA256SUMS
+        working-directory: dist
+        run: sha256sum Mangue-*.dmg mangue-*.zip mangue-*.tar.gz > SHA256SUMS
       - uses: softprops/action-gh-release@v2
         with:
           draft: true

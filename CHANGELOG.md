@@ -6,10 +6,18 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.1]
+
 ### Added
 
 - MIT license, contributor guide, code of conduct, security policy and GitHub
   issue / pull request templates.
+- `SHA256SUMS` attached to every GitHub release.
+- Homebrew cask install docs (`brew install --cask rntgspr/tap/mangue`).
+
+### Changed
+
+- First stable (non pre-release) release, so it is GitHub's "latest" for Homebrew livecheck.
 
 ## [0.1.0]
 

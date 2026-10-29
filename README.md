@@ -14,6 +14,14 @@ Download the package for your platform from
 
 ### macOS (13 or later)
 
+With [Homebrew](https://brew.sh):
+
+```sh
+brew install --cask rntgspr/tap/mangue
+```
+
+Or manually:
+
 1. Open `Mangue-<version>.dmg` and drag `Mangue.app` to `Applications`.
 2. If the build is not notarized, right-click `Mangue.app` > **Open** the first
    time to get past Gatekeeper.
