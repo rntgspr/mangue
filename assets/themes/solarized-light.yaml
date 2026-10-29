@@ -1,0 +1,50 @@
+# Solarized light (https://ethanschoonover.com/solarized/).
+# Built-in mangue theme; also the reference for every theme key.
+canvas:
+  background: "#fdf6e3" # base3
+shape:
+  stroke: "#657b83" # base00
+  fill: "#fdf6e3" # base3
+  label: "#586e75" # base01
+  event_fill: null
+  task_fill: "#eee8d5" # base2
+  gateway_fill: null
+  data_fill: null
+  band_fill: null
+flow:
+  stroke: "#586e75" # base01
+selection: "#268bd2" # blue
+hover: "#2aa198" # cyan
+lasso: "#268bd2" # blue
+grid: "#ddd6c1" # base2, darkened (dot grid)
+palette:
+  background: "#eee8d5" # base2
+  border: "#93a1a1" # base1
+  icon: "#586e75" # base01
+  hover: "#2aa198" # cyan
+context_pad:
+  background: "#eee8d5" # base2
+replace_menu:
+  background: "#fdf6e3" # base3
+  border: "#93a1a1" # base1
+  text: "#586e75" # base01
+label_editor:
+  background: "#fdf6e3" # base3
+  border: "#268bd2" # blue
+  text: "#586e75" # base01
+overlay:
+  badge:
+    background: "#eee8d5" # base2
+    border: "#93a1a1" # base1
+    text: "#586e75" # base01
+  error:
+    background: "#fdf6e3" # base3
+    border: "#dc322f" # red
+    text: "#dc322f" # red
+stroke_width:
+  shape: 2.0
+  end_event: 4.0
+  flow: 2.0
+font:
+  family: ".SystemUIFont"
+  size: 12.0

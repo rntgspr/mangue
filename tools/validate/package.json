@@ -1,0 +1,9 @@
+{
+  "name": "mangue-validate",
+  "private": true,
+  "type": "module",
+  "description": "Validates exported BPMN XML with bpmn-moddle (the bpmn-js parser).",
+  "dependencies": {
+    "bpmn-moddle": "10.3.1"
+  }
+}

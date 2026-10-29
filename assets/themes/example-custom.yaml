@@ -1,0 +1,40 @@
+# Example user theme (reference only; NOT embedded as a built-in).
+# Copy to ~/.config/mangue/themes/ (or $XDG_CONFIG_HOME/mangue/themes/),
+# then select it in ~/.config/mangue/theme.yaml with
+#   extends: midnight-ink
+# or
+#   appearance: { light: solarized-light, dark: midnight-ink }
+#
+# Every key is optional: missing keys come from `extends` (a built-in or
+# another user theme). Without `extends`, a theme named like a built-in
+# extends that built-in; any other name extends solarized-light.
+# Colors: "#rrggbb" or "#rrggbbaa". `*_fill: null` falls back to shape.fill.
+
+name: midnight-ink          # optional; defaults to the file name stem
+extends: tokyonight-night   # built-in or user theme name
+
+canvas:
+  background: "#0f1117"
+shape:
+  stroke: "#9aa5ce"         # shape outlines
+  fill: "#161a23"
+  label: "#e0e6ff"          # all label text
+  task_fill: "#1c2130"      # tasks, call activities, sub-processes
+  band_fill: null           # pools and lanes -> shape.fill
+flow:
+  stroke: "#6b7394"         # connections
+selection: "#ff9e64"        # selection outline, connect preview, space guides
+hover: "#7dcfff"
+lasso: "#ff9e64"
+grid: "#1f2430"             # snap grid dots (keep low contrast)
+palette:
+  hover: "#ff9e64"          # active palette entry highlight
+overlay:
+  error:
+    border: "#f7768e"       # error tooltip and not-allowed marker
+    text: "#f7768e"
+stroke_width:
+  shape: 1.5
+  flow: 1.5
+font:
+  size: 13

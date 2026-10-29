@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose new behavior or a bpmn-js parity gap.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: input
+    id: parity
+    attributes:
+      label: bpmn-js reference
+      description: If bpmn-js already does this, link the demo, doc or source.

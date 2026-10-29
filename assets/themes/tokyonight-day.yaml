@@ -1,0 +1,50 @@
+# Tokyo Night (day) (https://github.com/folke/tokyonight.nvim, tag v4.14.1,
+# extras/lua/tokyonight_day.lua). Built-in mangue theme.
+canvas:
+  background: "#e1e2e7" # bg
+shape:
+  stroke: "#6172b0" # fg_dark
+  fill: "#d0d5e3" # bg_dark
+  label: "#3760bf" # fg
+  event_fill: null
+  task_fill: null
+  gateway_fill: null
+  data_fill: null
+  band_fill: "#e1e2e7" # bg
+flow:
+  stroke: "#848cb5" # comment
+selection: "#2e7de9" # blue
+hover: "#007197" # cyan
+lasso: "#9854f1" # magenta
+grid: "#c4c8da" # between bg_dark and fg_gutter (dot grid)
+palette:
+  background: "#d0d5e3" # bg_dark
+  border: "#a8aecb" # fg_gutter
+  icon: "#3760bf" # fg
+  hover: "#007197" # cyan
+context_pad:
+  background: "#d0d5e3" # bg_dark
+replace_menu:
+  background: "#d0d5e3" # bg_dark
+  border: "#a8aecb" # fg_gutter
+  text: "#3760bf" # fg
+label_editor:
+  background: "#d0d5e3" # bg_dark
+  border: "#2e7de9" # blue
+  text: "#3760bf" # fg
+overlay:
+  badge:
+    background: "#d0d5e3" # bg_dark
+    border: "#a8aecb" # fg_gutter
+    text: "#3760bf" # fg
+  error:
+    background: "#d0d5e3" # bg_dark
+    border: "#f52a65" # red
+    text: "#f52a65" # red
+stroke_width:
+  shape: 2.0
+  end_event: 4.0
+  flow: 2.0
+font:
+  family: ".SystemUIFont"
+  size: 12.0

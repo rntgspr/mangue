@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_Vertical" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="17.11.1">
+  <bpmn:collaboration id="Collaboration_V">
+    <bpmn:participant id="Participant_V" name="Vertical" processRef="Process_V" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_V" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_V">
+      <bpmn:lane id="Lane_Left" name="Left">
+        <bpmn:flowNodeRef>Task_A</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Boundary_Comp</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Right" name="Right">
+        <bpmn:flowNodeRef>Task_B</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Undo</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:task id="Task_A" name="Collect">
+      <bpmn:outgoing>Flow_AB</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_B" name="Ship">
+      <bpmn:incoming>Flow_AB</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:boundaryEvent id="Boundary_Comp" attachedToRef="Task_A">
+      <bpmn:compensateEventDefinition id="CompensateEventDefinition_V" />
+    </bpmn:boundaryEvent>
+    <bpmn:task id="Task_Undo" name="Undo collect" isForCompensation="true" />
+    <bpmn:sequenceFlow id="Flow_AB" sourceRef="Task_A" targetRef="Task_B" />
+    <bpmn:association id="Association_V" associationDirection="One" sourceRef="Boundary_Comp" targetRef="Task_Undo" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_V">
+    <bpmndi:BPMNPlane id="BPMNPlane_V" bpmnElement="Collaboration_V">
+      <bpmndi:BPMNShape id="Participant_V_di" bpmnElement="Participant_V" isHorizontal="false">
+        <dc:Bounds x="100" y="60" width="400" height="460" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Left_di" bpmnElement="Lane_Left" isHorizontal="false">
+        <dc:Bounds x="100" y="90" width="200" height="430" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Right_di" bpmnElement="Lane_Right" isHorizontal="false">
+        <dc:Bounds x="300" y="90" width="200" height="430" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_A_di" bpmnElement="Task_A">
+        <dc:Bounds x="160" y="120" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_B_di" bpmnElement="Task_B">
+        <dc:Bounds x="360" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Undo_di" bpmnElement="Task_Undo">
+        <dc:Bounds x="360" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Boundary_Comp_di" bpmnElement="Boundary_Comp">
+        <dc:Bounds x="192" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_AB_di" bpmnElement="Flow_AB">
+        <di:waypoint x="210" y="200" />
+        <di:waypoint x="210" y="250" />
+        <di:waypoint x="410" y="250" />
+        <di:waypoint x="410" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_V_di" bpmnElement="Association_V">
+        <di:waypoint x="210" y="218" />
+        <di:waypoint x="210" y="460" />
+        <di:waypoint x="360" y="460" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

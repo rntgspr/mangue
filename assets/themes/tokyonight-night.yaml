@@ -1,0 +1,50 @@
+# Tokyo Night (night) (https://github.com/folke/tokyonight.nvim, tag v4.14.1,
+# extras/lua/tokyonight_night.lua). Built-in mangue theme.
+canvas:
+  background: "#1a1b26" # bg
+shape:
+  stroke: "#a9b1d6" # fg_dark
+  fill: "#16161e" # bg_dark
+  label: "#c0caf5" # fg
+  event_fill: null
+  task_fill: null
+  gateway_fill: null
+  data_fill: null
+  band_fill: "#1a1b26" # bg
+flow:
+  stroke: "#565f89" # comment
+selection: "#7aa2f7" # blue
+hover: "#7dcfff" # cyan
+lasso: "#bb9af7" # magenta
+grid: "#2f344a" # bg_highlight, lightened (dot grid)
+palette:
+  background: "#16161e" # bg_dark
+  border: "#3b4261" # fg_gutter
+  icon: "#c0caf5" # fg
+  hover: "#7dcfff" # cyan
+context_pad:
+  background: "#16161e" # bg_dark
+replace_menu:
+  background: "#16161e" # bg_dark
+  border: "#3b4261" # fg_gutter
+  text: "#c0caf5" # fg
+label_editor:
+  background: "#16161e" # bg_dark
+  border: "#7aa2f7" # blue
+  text: "#c0caf5" # fg
+overlay:
+  badge:
+    background: "#16161e" # bg_dark
+    border: "#414868" # fg_gutter
+    text: "#c0caf5" # fg
+  error:
+    background: "#16161e" # bg_dark
+    border: "#f7768e" # red
+    text: "#f7768e" # red
+stroke_width:
+  shape: 2.0
+  end_event: 4.0
+  flow: 2.0
+font:
+  family: ".SystemUIFont"
+  size: 12.0

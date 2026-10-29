@@ -1,0 +1,50 @@
+# Solarized dark (https://ethanschoonover.com/solarized/).
+# Built-in mangue theme.
+canvas:
+  background: "#002b36" # base03
+shape:
+  stroke: "#839496" # base0
+  fill: "#073642" # base02
+  label: "#93a1a1" # base1
+  event_fill: null
+  task_fill: null
+  gateway_fill: null
+  data_fill: null
+  band_fill: "#002b36" # base03
+flow:
+  stroke: "#93a1a1" # base1
+selection: "#268bd2" # blue
+hover: "#2aa198" # cyan
+lasso: "#268bd2" # blue
+grid: "#0b4150" # base02, lightened (dot grid)
+palette:
+  background: "#073642" # base02
+  border: "#586e75" # base01
+  icon: "#93a1a1" # base1
+  hover: "#2aa198" # cyan
+context_pad:
+  background: "#073642" # base02
+replace_menu:
+  background: "#073642" # base02
+  border: "#586e75" # base01
+  text: "#93a1a1" # base1
+label_editor:
+  background: "#073642" # base02
+  border: "#268bd2" # blue
+  text: "#93a1a1" # base1
+overlay:
+  badge:
+    background: "#073642" # base02
+    border: "#586e75" # base01
+    text: "#93a1a1" # base1
+  error:
+    background: "#073642" # base02
+    border: "#dc322f" # red
+    text: "#dc322f" # red
+stroke_width:
+  shape: 2.0
+  end_event: 4.0
+  flow: 2.0
+font:
+  family: ".SystemUIFont"
+  size: 12.0

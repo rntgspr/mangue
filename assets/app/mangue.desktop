@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Mangue
+GenericName=BPMN Modeler
+Comment=BPMN 2.0 modeler
+Exec=mangue %f
+Icon=mangue
+Terminal=false
+Categories=Development;Graphics;
+MimeType=application/x-bpmn;
+StartupWMClass=mangue

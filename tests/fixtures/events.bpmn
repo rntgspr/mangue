@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Default-namespace document with every event definition, boundary events,
+     sub-processes and a few elements mangue does not model. -->
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:foo="http://example.com/foo" id="Definitions_Events" targetNamespace="http://bpmn.io/schema/bpmn">
+  <message id="Message_1" name="Ping" />
+  <signal id="Signal_1" name="Alarm" />
+  <error id="Error_1" name="Boom" />
+  <escalation id="Escalation_1" name="Up" />
+  <process id="Process_Events" isExecutable="true">
+    <extensionElements>
+      <foo:meta value="ignored" />
+    </extensionElements>
+    <startEvent id="Start_Timer" name="Every day">
+      <outgoing>Flow_1</outgoing>
+      <timerEventDefinition id="TimerEventDefinition_1">
+        <timeCycle xsi:type="tFormalExpression">R/P1D</timeCycle>
+      </timerEventDefinition>
+    </startEvent>
+    <subProcess id="Sub_Work" name="Do work" default="Flow_3">
+      <incoming>Flow_1</incoming>
+      <outgoing>Flow_2</outgoing>
+      <outgoing>Flow_3</outgoing>
+      <startEvent id="Sub_Start" />
+      <scriptTask id="Sub_Script" name="Run script" />
+      <endEvent id="Sub_End">
+        <errorEventDefinition id="ErrorEventDefinition_1" />
+      </endEvent>
+      <sequenceFlow id="Sub_Flow_1" sourceRef="Sub_Start" targetRef="Sub_Script" />
+      <sequenceFlow id="Sub_Flow_2" sourceRef="Sub_Script" targetRef="Sub_End" />
+    </subProcess>
+    <boundaryEvent id="Boundary_Timer" name="Too slow" cancelActivity="false" attachedToRef="Sub_Work">
+      <outgoing>Flow_4</outgoing>
+      <timerEventDefinition id="TimerEventDefinition_2">
+        <timeDuration xsi:type="tFormalExpression">PT1H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <boundaryEvent id="Boundary_Error" attachedToRef="Sub_Work">
+      <errorEventDefinition id="ErrorEventDefinition_2" errorRef="Error_1" />
+    </boundaryEvent>
+    <intermediateThrowEvent id="Throw_Signal" name="Notify">
+      <incoming>Flow_4</incoming>
+      <signalEventDefinition id="SignalEventDefinition_1" signalRef="Signal_1" />
+    </intermediateThrowEvent>
+    <intermediateCatchEvent id="Catch_Message">
+      <messageEventDefinition id="MessageEventDefinition_1" messageRef="Message_1" />
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="Catch_Conditional">
+      <conditionalEventDefinition id="ConditionalEventDefinition_1">
+        <condition xsi:type="tFormalExpression">${ready}</condition>
+      </conditionalEventDefinition>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="Catch_Link" name="L1">
+      <linkEventDefinition id="LinkEventDefinition_1" name="L1" />
+    </intermediateCatchEvent>
+    <intermediateThrowEvent id="Throw_Escalation">
+      <escalationEventDefinition id="EscalationEventDefinition_1" />
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="Throw_Compensation">
+      <compensateEventDefinition id="CompensateEventDefinition_1" />
+    </intermediateThrowEvent>
+    <intermediateThrowEvent id="Throw_None" />
+    <endEvent id="End_Terminate">
+      <incoming>Flow_2</incoming>
+      <terminateEventDefinition id="TerminateEventDefinition_1" />
+    </endEvent>
+    <endEvent id="End_Plain">
+      <incoming>Flow_3</incoming>
+    </endEvent>
+    <subProcess id="Event_Sub" triggeredByEvent="true">
+      <startEvent id="Event_Sub_Start" isInterrupting="false">
+        <escalationEventDefinition id="EscalationEventDefinition_2" escalationRef="Escalation_1" />
+      </startEvent>
+    </subProcess>
+    <callActivity id="Call_1" name="Call other" calledElement="Other" />
+    <task id="Task_Plain" />
+    <receiveTask id="Task_Receive" />
+    <manualTask id="Task_Manual" />
+    <businessRuleTask id="Task_Rule" />
+    <parallelGateway id="Gw_Parallel" />
+    <inclusiveGateway id="Gw_Inclusive" />
+    <eventBasedGateway id="Gw_Event" />
+    <complexGateway id="Gw_Complex" />
+    <foo:customTask id="Unknown_1" />
+    <sequenceFlow id="Flow_1" sourceRef="Start_Timer" targetRef="Sub_Work" />
+    <sequenceFlow id="Flow_2" sourceRef="Sub_Work" targetRef="End_Terminate" />
+    <sequenceFlow id="Flow_3" sourceRef="Sub_Work" targetRef="End_Plain" />
+    <sequenceFlow id="Flow_4" sourceRef="Boundary_Timer" targetRef="Throw_Signal" />
+    <group id="Group_1" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_Events">
+      <bpmndi:BPMNShape id="Shape_Start_Timer" bpmnElement="Start_Timer">
+        <omgdc:Bounds x="152" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sub_Work_di" bpmnElement="Sub_Work" isExpanded="true">
+        <omgdc:Bounds x="250" y="100" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sub_Start_di" bpmnElement="Sub_Start">
+        <omgdc:Bounds x="282" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sub_Script_di" bpmnElement="Sub_Script">
+        <omgdc:Bounds x="370" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sub_End_di" bpmnElement="Sub_End">
+        <omgdc:Bounds x="522" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Boundary_Timer_di" bpmnElement="Boundary_Timer">
+        <omgdc:Bounds x="402" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="398" y="325" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Boundary_Error_di" bpmnElement="Boundary_Error">
+        <omgdc:Bounds x="502" y="282" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Throw_Signal_di" bpmnElement="Throw_Signal">
+        <omgdc:Bounds x="402" y="382" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Terminate_di" bpmnElement="End_Terminate">
+        <omgdc:Bounds x="682" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Plain_di" bpmnElement="End_Plain">
+        <omgdc:Bounds x="682" y="252" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_Sub_di" bpmnElement="Event_Sub" isExpanded="false">
+        <omgdc:Bounds x="250" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Call_1_di" bpmnElement="Call_1">
+        <omgdc:Bounds x="400" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_Parallel_di" bpmnElement="Gw_Parallel">
+        <omgdc:Bounds x="550" y="465" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Unknown_1_di" bpmnElement="Unknown_1">
+        <omgdc:Bounds x="650" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Group_1_di" bpmnElement="Group_1">
+        <omgdc:Bounds x="120" y="60" width="640" height="300" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <omgdi:waypoint x="188" y="200" />
+        <omgdi:waypoint x="250" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <omgdi:waypoint x="600" y="200" />
+        <omgdi:waypoint x="682" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <omgdi:waypoint x="600" y="270" />
+        <omgdi:waypoint x="682" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <omgdi:waypoint x="420" y="318" />
+        <omgdi:waypoint x="420" y="382" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Sub_Flow_1_di" bpmnElement="Sub_Flow_1">
+        <omgdi:waypoint x="318" y="200" />
+        <omgdi:waypoint x="370" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Sub_Flow_2_di" bpmnElement="Sub_Flow_2">
+        <omgdi:waypoint x="470" y="200" />
+        <omgdi:waypoint x="522" y="200" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
