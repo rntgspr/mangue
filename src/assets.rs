@@ -63,6 +63,7 @@ const FILES: &[(&str, &[u8])] = &[
         include_bytes!("../assets/icons/rows-3.svg"),
     ),
     ("icons/plus.svg", include_bytes!("../assets/icons/plus.svg")),
+    ("icons/x.svg", include_bytes!("../assets/icons/x.svg")),
     (
         "themes/solarized-light.yaml",
         include_bytes!("../assets/themes/solarized-light.yaml"),

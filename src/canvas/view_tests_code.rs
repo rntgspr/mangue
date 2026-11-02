@@ -2,6 +2,131 @@
 
 use super::*;
 
+/// XML highlighting covers nested content and the matching closing tag.
+#[gpui::test]
+fn selected_xml_range_covers_complete_element(_cx: &mut TestAppContext) {
+    let xml = "<root><task id=\"a\"><task><child /></task></task><task id=\"b\" /></root>";
+    let range = crate::canvas::code_view::element_range(xml, &ElementId::from("a")).unwrap();
+    assert_eq!(&xml[range], "<task id=\"a\"><task><child /></task></task>");
+
+    let range = crate::canvas::code_view::element_range(xml, &ElementId::from("b")).unwrap();
+    assert_eq!(&xml[range], "<task id=\"b\" />");
+}
+
+/// The document breadcrumb reflects the XML IDs in the active selection.
+#[gpui::test]
+fn header_breadcrumb_tracks_selection(cx: &mut TestAppContext) {
+    let (view, cx) = open(cx);
+    assert_eq!(
+        view.read_with(cx, |c, _| c.header_labels()),
+        vec!["Untitled"]
+    );
+
+    cx.simulate_click(at(START_CENTER.0, START_CENTER.1), Modifiers::none());
+    assert_eq!(
+        view.read_with(cx, |c, _| c.header_labels()),
+        vec!["Untitled", "Process_1", START]
+    );
+
+    view.update(cx, |c, cx| {
+        c.docs[c.active].selection.push(ElementId::from("another"));
+        cx.notify();
+    });
+    assert_eq!(
+        view.read_with(cx, |c, _| c.header_labels()),
+        vec!["Untitled", "2 selected"]
+    );
+}
+
+/// Clicking the process ancestor selects it even without a diagram shape.
+#[gpui::test]
+fn breadcrumb_selects_process_ancestor(cx: &mut TestAppContext) {
+    let (view, cx) = open(cx);
+    cx.simulate_click(at(START_CENTER.0, START_CENTER.1), Modifiers::none());
+    cx.run_until_parked();
+
+    let crumbs = cx.debug_bounds("breadcrumbs").unwrap();
+    for x in (50..180).step_by(5) {
+        cx.simulate_click(
+            point(crumbs.left() + px(x as f32), crumbs.center().y),
+            Modifiers::none(),
+        );
+        cx.run_until_parked();
+        if selection(&view, cx) == vec![ElementId::from("Process_1")] {
+            break;
+        }
+    }
+
+    assert_eq!(selection(&view, cx), vec![ElementId::from("Process_1")]);
+}
+
+/// Selecting an ancestor in code mode updates the visual marker without selecting text.
+#[gpui::test]
+fn code_breadcrumb_updates_highlight(cx: &mut TestAppContext) {
+    let (view, cx) = open(cx);
+    cx.simulate_click(at(START_CENTER.0, START_CENTER.1), Modifiers::none());
+    cx.dispatch_action(actions::ToggleMode);
+    cx.run_until_parked();
+
+    let crumbs = cx.debug_bounds("breadcrumbs").unwrap();
+    for x in (50..180).step_by(5) {
+        cx.simulate_click(
+            point(crumbs.left() + px(x as f32), crumbs.center().y),
+            Modifiers::none(),
+        );
+        cx.run_until_parked();
+        if selection(&view, cx) == vec![ElementId::from("Process_1")] {
+            break;
+        }
+    }
+
+    view.read_with(cx, |canvas, cx| {
+        let doc = &canvas.docs[canvas.active];
+        assert_eq!(doc.selection, vec![ElementId::from("Process_1")]);
+        let editor = doc.editor.as_ref().unwrap().read(cx);
+        let range = doc
+            .selection_highlight
+            .as_ref()
+            .unwrap()
+            .get_ranges(cx)
+            .pop()
+            .unwrap();
+        assert!(editor.value()[range].starts_with("<bpmn:process"));
+        assert!(editor.selected_range().is_empty());
+    });
+}
+
+/// Entering code mode reveals the selected element without selecting text.
+#[gpui::test]
+fn code_mode_reveals_selected_element(cx: &mut TestAppContext) {
+    let (view, cx) = open(cx);
+    cx.simulate_click(at(START_CENTER.0, START_CENTER.1), Modifiers::none());
+    cx.dispatch_action(actions::ToggleMode);
+    cx.run_until_parked();
+
+    view.read_with(cx, |canvas, cx| {
+        let editor = canvas.docs[canvas.active].editor.as_ref().unwrap().read(cx);
+        let range = editor.selected_range();
+        assert!(range.is_empty());
+        let xml = editor.value();
+        let element = xml.find("id=\"StartEvent_1\"").unwrap();
+        assert!(range.start <= element && element - range.start < 100);
+    });
+}
+
+/// The header controls share a 16px inset from the window edges.
+#[gpui::test]
+fn document_header_has_horizontal_insets(cx: &mut TestAppContext) {
+    let (_view, cx) = open(cx);
+    cx.run_until_parked();
+
+    let width = cx.update(|window, _| window.viewport_size().width);
+    let crumb = cx.debug_bounds("breadcrumbs").expect("breadcrumb rendered");
+    let button = cx.debug_bounds("doc-header-mode").expect("button rendered");
+    assert_eq!(crumb.left(), px(16.));
+    assert_eq!(width - button.right(), px(16.));
+}
+
 /// Whether the active document is in code mode.
 fn code_mode(view: &Entity<Canvas>, cx: &mut VisualTestContext) -> bool {
     view.read_with(cx, |c, _| c.docs[c.active].code_mode)
@@ -48,7 +173,9 @@ fn clicking_mode_button_flips_mode(cx: &mut TestAppContext) {
 #[gpui::test]
 fn clicking_mode_button_by_selector_flips_mode(cx: &mut TestAppContext) {
     let (view, cx) = open(cx);
-    let button = cx.debug_bounds("doc-header-mode").expect("mode button rendered");
+    let button = cx
+        .debug_bounds("doc-header-mode")
+        .expect("mode button rendered");
 
     cx.simulate_click(button.center(), Modifiers::none());
     assert!(code_mode(&view, cx));

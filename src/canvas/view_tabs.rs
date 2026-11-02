@@ -10,13 +10,13 @@ use gpui::{
 use super::AfterConfirm;
 use super::{Canvas, Gesture, aids};
 use crate::canvas::actions::{ActivateLastTab, ActivateTab, NextTab, PrevTab};
-use crate::canvas::code_view::new_editor;
+use crate::canvas::code_view::{element_range, new_editor};
 use crate::canvas::doc_header::DocHeader;
 use crate::canvas::document::Document;
 use crate::canvas::tab_bar::TabBar;
 use crate::canvas::xml_error::XmlError;
 use crate::model::Definitions;
-use gpui_component::input::Editor;
+use gpui_component::input::{Editor, RangeDecoration, RangeDecorationStyle};
 
 impl Canvas {
     /// Commits a pending label edit and drops every interaction state tied
@@ -177,15 +177,71 @@ impl Canvas {
         )
     }
 
-    /// The document header: the active document's name as breadcrumb
-    /// placeholder and the mode button toggling its mode.
+    /// Returns the active file and selection labels for the document header.
+    pub(super) fn header_labels(&self) -> Vec<String> {
+        let doc = &self.docs[self.active];
+        let mut labels = vec![doc.title_name()];
+
+        match doc.selection.as_slice() {
+            [] => {}
+            [id] => {
+                let mut ancestors = Vec::new();
+                let mut current = Some(id);
+
+                while let Some(id) = current {
+                    if ancestors.contains(id) {
+                        break;
+                    }
+                    ancestors.push(id.clone());
+                    current = doc
+                        .definitions
+                        .get(id)
+                        .and_then(|element| element.parent.as_ref());
+                }
+
+                labels.extend(ancestors.into_iter().rev().map(|id| id.0));
+            }
+            selected => labels.push(format!("{} selected", selected.len())),
+        }
+
+        labels
+    }
+
+    /// Builds the document header and its mode action.
     pub(super) fn doc_header(&self, cx: &mut Context<Self>) -> DocHeader {
         let doc = &self.docs[self.active];
         let view = cx.entity();
 
-        DocHeader::new(doc.title_name(), doc.code_mode, move |_, cx| {
-            view.update(cx, |c, cx| c.toggle_mode(cx));
-        })
+        let select_view = cx.entity();
+        let single = doc.selection.len() == 1;
+
+        DocHeader::new(
+            self.header_labels(),
+            single,
+            doc.code_mode,
+            move |id, _, cx| {
+                select_view.update(cx, |canvas, cx| {
+                    canvas.reset_transient(cx);
+                    canvas.docs[canvas.active].selection = vec![id.clone()];
+                    let doc = &canvas.docs[canvas.active];
+                    if let (Some(editor), Some(highlight)) = (&doc.editor, &doc.selection_highlight)
+                    {
+                        let xml = editor.read(cx).value();
+                        let ranges = element_range(&xml, id)
+                            .into_iter()
+                            .map(|range| {
+                                RangeDecoration::new(range).with_style(RangeDecorationStyle::Fill)
+                            })
+                            .collect();
+                        highlight.set(ranges, cx);
+                    }
+                    cx.notify();
+                });
+            },
+            move |_, cx| {
+                view.update(cx, |c, cx| c.toggle_mode(cx));
+            },
+        )
     }
 
     /// Flips the active document between preview and code mode; leaving code
@@ -291,9 +347,19 @@ impl Canvas {
         }
 
         if doc.editor.is_none() {
-            let editor = new_editor(&crate::io::export_xml(&doc.definitions), window, cx);
+            let selected = match doc.selection.as_slice() {
+                [id] => Some(id),
+                _ => None,
+            };
+            let (editor, highlight) = new_editor(
+                &crate::io::export_xml(&doc.definitions),
+                selected,
+                window,
+                cx,
+            );
             window.focus(&editor.read(cx).focus_handle(cx), cx);
             doc.editor = Some(editor);
+            doc.selection_highlight = Some(highlight);
         }
 
         let editor = doc.editor.clone().expect("editor created above");

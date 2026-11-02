@@ -5,15 +5,15 @@
 use std::rc::Rc;
 
 use gpui::{App, SharedString, Window, div, prelude::*, px};
-use gpui_component::Sizable;
-use gpui_component::button::{Button, ButtonVariants};
+use gpui_component::button::{Button, ButtonRounded, ButtonVariants};
 use gpui_component::tab::{Tab, TabBar as GpuiTabBar};
+use gpui_component::{Icon, Sizable};
 
 /// Callback taking the clicked tab index.
 type PickHandler = Rc<dyn Fn(&usize, &mut Window, &mut App)>;
 
 /// Height of the tab strip in pixels.
-pub const HEIGHT: f32 = 28.0;
+pub const HEIGHT: f32 = 36.0;
 
 /// Tabs as (name, dirty) with the `active` one highlighted.
 #[derive(IntoElement)]
@@ -53,14 +53,18 @@ impl RenderOnce for TabBar {
             .map(|(index, (name, dirty))| {
                 let on_close = self.on_close.clone();
                 let tab_selector = format!("tab-{index}");
+                let label_selector = format!("tab-label-{index}");
                 let dirty_selector = format!("tab-dirty-{index}");
                 let close_selector = format!("tab-close-{index}");
+                let hover_group = SharedString::from(format!("tab-hover-{index}"));
 
                 let close = Button::new(SharedString::from(close_selector.clone()))
                     .debug_selector(move || close_selector)
                     .ghost()
                     .xsmall()
-                    .label("x")
+                    .rounded(ButtonRounded::None)
+                    .icon(Icon::default().path("icons/x.svg"))
+                    .accessibility_label(format!("Close {name}"))
                     .on_click(move |_, window, cx| {
                         cx.stop_propagation();
                         on_close(&index, window, cx);
@@ -69,19 +73,34 @@ impl RenderOnce for TabBar {
 
                 Tab::new()
                     .debug_selector(move || tab_selector)
-                    .label(name)
+                    .group(hover_group.clone())
+                    .aria_label(name.clone())
+                    .child(
+                        div()
+                            .debug_selector(move || label_selector)
+                            .text_xs()
+                            .ml(px(-8.))
+                            .child(name),
+                    )
                     .suffix(
                         div()
                             .flex()
                             .items_center()
                             .gap_1()
+                            .pr_2()
                             .children(marker)
-                            .child(close),
+                            .child(
+                                div()
+                                    .invisible()
+                                    .group_hover(&hover_group, |style| style.visible())
+                                    .child(close),
+                            ),
                     )
             });
 
         let on_pick = self.on_pick.clone();
         GpuiTabBar::new("tab-bar")
+            .large()
             .h(px(HEIGHT))
             .w_full()
             .flex_none()

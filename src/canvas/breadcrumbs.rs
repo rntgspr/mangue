@@ -15,6 +15,7 @@ use crate::theme::Theme;
 pub struct Breadcrumbs {
     origin: Waypoint,
     crumbs: Vec<Crumb>,
+    plain: bool,
     on_pick: Rc<dyn Fn(Option<&ElementId>, &mut Window, &mut App)>,
 }
 
@@ -28,8 +29,15 @@ impl Breadcrumbs {
         Breadcrumbs {
             origin,
             crumbs,
+            plain: false,
             on_pick: Rc::new(on_pick),
         }
+    }
+
+    /// Displays the breadcrumb without its popup container.
+    pub fn plain(mut self) -> Self {
+        self.plain = true;
+        self
     }
 }
 
@@ -40,6 +48,7 @@ impl RenderOnce for Breadcrumbs {
         let colors = Theme::current(cx).replace_menu;
         let last = self.crumbs.len().saturating_sub(1);
 
+        let plain = self.plain;
         let items = self.crumbs.into_iter().enumerate().map(|(i, crumb)| {
             let item = BreadcrumbItem::new(crumb.label)
                 .max_w(px(200.))
@@ -52,10 +61,11 @@ impl RenderOnce for Breadcrumbs {
 
             let on_pick = self.on_pick.clone();
             let plane = crumb.plane;
-            item.on_click(move |_, window, cx| {
-                cx.stop_propagation();
-                on_pick(plane.as_ref(), window, cx);
-            })
+            item.when(plain && plane.is_some(), |item| item.underline())
+                .on_click(move |_, window, cx| {
+                    cx.stop_propagation();
+                    on_pick(plane.as_ref(), window, cx);
+                })
         });
 
         div()
@@ -65,13 +75,15 @@ impl RenderOnce for Breadcrumbs {
             .left(px(self.origin.x as f32))
             .top(px(self.origin.y as f32))
             .h(px(28.))
-            .px_2()
             .flex()
             .items_center()
-            .bg(colors.background.hsla())
-            .border_1()
-            .border_color(colors.border.hsla())
-            .rounded_sm()
+            .when(!plain, |this| {
+                this.px_2()
+                    .bg(colors.background.hsla())
+                    .border_1()
+                    .border_color(colors.border.hsla())
+                    .rounded_sm()
+            })
             .child(Breadcrumb::new().children(items))
             .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
     }

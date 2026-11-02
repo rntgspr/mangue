@@ -3,6 +3,16 @@
 
 use super::*;
 
+/// The tab strip leaves enough height for comfortable document navigation.
+#[gpui::test]
+fn tab_strip_has_room_for_labels(cx: &mut TestAppContext) {
+    let (_view, cx) = open(cx);
+    cx.run_until_parked();
+
+    let tab = cx.debug_bounds("tab-0").expect("tab rendered");
+    assert!(tab.size.height >= px(36.));
+}
+
 /// Opens a second tab holding the empty diagram, loaded from `path`.
 fn open_second(view: &Entity<Canvas>, cx: &mut VisualTestContext, path: Option<&str>) {
     let path = path.map(std::path::PathBuf::from);
@@ -362,10 +372,19 @@ fn tab_strip_clicks_activate_and_close(cx: &mut TestAppContext) {
     cx.run_until_parked();
     assert!(cx.debug_bounds("tab-dirty-0").is_some());
     assert!(cx.debug_bounds("tab-dirty-1").is_none());
+    assert!(cx.debug_bounds("tab-close-1").is_none());
+
+    let second = cx.debug_bounds("tab-1").expect("second tab rendered");
+    cx.simulate_mouse_move(second.center(), None, Modifiers::none());
+    cx.run_until_parked();
 
     let close = cx
         .debug_bounds("tab-close-1")
         .expect("close button rendered");
+    assert_eq!(close.size.width, close.size.height);
+    let label = cx.debug_bounds("tab-label-1").expect("label rendered");
+    assert_eq!(label.left() - second.left(), second.right() - close.right());
+    assert_eq!(label.left() - second.left(), px(9.));
     cx.simulate_click(close.center(), Modifiers::none());
     cx.run_until_parked();
     assert!(!cx.has_pending_prompt());

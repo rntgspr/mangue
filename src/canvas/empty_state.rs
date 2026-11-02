@@ -22,21 +22,21 @@ impl RenderOnce for EmptyState {
                 EmptyTitle::new().child(
                     div()
                         .debug_selector(|| "empty-state-title".into())
-                        .child("No diagram open"),
+                        .child("Welcome to Mangue!"),
                 ),
             )
             .description(
                 EmptyDescription::new().child(
                     div()
                         .debug_selector(|| "empty-state-hint".into())
-                        .child("or press Cmd+O"),
+                        .child("press Cmd+O to:"),
                 ),
             );
 
         let open = Button::new("empty-state-open")
             .debug_selector(|| "empty-state-open".into())
             .primary()
-            .label("Open File")
+            .label("Open a File")
             .on_click(|_, window, cx| {
                 cx.stop_propagation();
                 window.dispatch_action(Open.boxed_clone(), cx);

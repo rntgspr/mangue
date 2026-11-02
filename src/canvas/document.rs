@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use gpui::Entity;
-use gpui_component::input::EditorState;
+use gpui_component::input::{EditorState, RangeDecorationCollection};
 
 use super::geometry::Viewport;
 use crate::model::{Definitions, ElementId};
@@ -39,6 +39,7 @@ pub struct Document {
     pub(super) code_mode: bool,
     /// The code editor, created on first render in code mode and dropped on leaving it.
     pub(super) editor: Option<Entity<EditorState>>,
+    pub(super) selection_highlight: Option<RangeDecorationCollection>,
     /// Import error of the edited XML left in code mode, shown over the canvas.
     pub(super) xml_error: Option<String>,
 }
@@ -61,6 +62,7 @@ impl Document {
             viewports: HashMap::new(),
             code_mode: false,
             editor: None,
+            selection_highlight: None,
             xml_error: None,
         }
     }
