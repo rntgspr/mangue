@@ -41,7 +41,8 @@ use crate::modeling::layout::center;
 use crate::modeling::ordering::{DiItem, paint_order};
 use crate::modeling::rules::{can_resize, connect_refusal, create_refusal, drop_refusal};
 use crate::modeling::{
-    Command, arrange, attach, auto_resize, created_id, created_shape, factory, lanes, waypoints,
+    Command, arrange, attach, auto_resize, created_id, created_shape, docking, factory, lanes,
+    waypoints,
 };
 use crate::settings::{GridSettings, Settings};
 use crate::theme::{self, Theme};
@@ -1041,7 +1042,7 @@ impl Canvas {
                 let b = defs.shape(id)?.bounds;
                 let (bounds, _) = self.snapped_resize(id, &b, *corner, *start, *current);
 
-                lanes::resize(defs, id, bounds)
+                lanes::resize(defs, id, bounds, self.grid.size)
             }
 
             Gesture::Waypoints {
@@ -1055,6 +1056,12 @@ impl Canvas {
                 let edited = match *grab {
                     EdgeGrab::Endpoint(start) => {
                         let to = hit_shape(defs.shapes(), *current)?;
+                        let own = defs.get(id)?.kind.endpoints()?;
+                        let own = if start { own.0 } else { own.1 };
+                        if to == own {
+                            return docking::redock(defs, id, start, *current);
+                        }
+
                         return factory::reconnect(defs, id, start, to);
                     }
 

@@ -592,10 +592,10 @@ fn resize_respects_min_size(cx: &mut TestAppContext) {
     assert_eq!((after.w, after.h), (140., 120.));
 }
 
-/// Tasks have no resize handles (bpmn-js `canResize`): a corner drag moves
-/// the task instead of resizing it.
+/// Tasks have resize handles (a mangue addition to bpmn-js `canResize`): a
+/// corner drag resizes the task, keeping the opposite corner.
 #[gpui::test]
-fn task_corner_drag_moves(cx: &mut TestAppContext) {
+fn task_corner_drag_resizes(cx: &mut TestAppContext) {
     let (view, cx) = open(cx);
     let id = create(&view, cx, ElementKind::Task, false, 500., 400.);
     let b = bounds_of(&view, cx, &id);
@@ -608,7 +608,8 @@ fn task_corner_drag_moves(cx: &mut TestAppContext) {
     );
 
     let after = bounds_of(&view, cx, &id);
-    assert_eq!((after.x, after.w, after.h), (b.x + 50., b.w, b.h));
+    assert_eq!((after.x, after.h), (b.x, b.h));
+    assert!(after.w > b.w, "{after:?}");
 }
 
 /// Dropping an intermediate event on a task border attaches it as a

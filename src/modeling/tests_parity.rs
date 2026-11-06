@@ -406,19 +406,44 @@ fn move_boundary_detaches_and_reattaches() {
     assert_eq!(bounds(&defs, "catch"), b(532.0, 362.0, 36.0, 36.0));
 }
 
-/// bpmn-js resize rules: tasks are not resizable; minimum sizes per kind.
+/// Resize rules: tasks resize down to 6 grid cells (a mangue addition to
+/// bpmn-js `canResize`); minimum sizes per kind.
 #[test]
 fn resize_rules_and_min_sizes() {
     let mut defs = process();
 
-    assert!(resize(&defs, &"task".into(), b(100.0, 100.0, 200.0, 80.0)).is_none());
-    assert_eq!(min_size(&ElementKind::Lane, false), Some((300.0, 60.0)));
+    let task = bounds(&defs, "task");
+    let wide = resize(
+        &defs,
+        &"task".into(),
+        b(task.x, task.y, 200.0, task.h),
+        10.0,
+    )
+    .unwrap();
+    let mut grown = defs.clone();
+    run(&mut grown, wide);
+    assert_eq!(bounds(&grown, "task").w, 200.0);
+
+    let tiny = resize(&defs, &"task".into(), b(task.x, task.y, 1.0, 1.0), 5.0).unwrap();
+    run(&mut grown, tiny);
     assert_eq!(
-        min_size(&ElementKind::Participant { process_ref: None }, false),
+        (bounds(&grown, "task").w, bounds(&grown, "task").h),
+        (30.0, 30.0)
+    );
+    assert_eq!(
+        min_size(&ElementKind::UserTask, false, 10.0),
+        Some((60.0, 60.0))
+    );
+    assert_eq!(
+        min_size(&ElementKind::Lane, false, 10.0),
+        Some((300.0, 60.0))
+    );
+    assert_eq!(
+        min_size(&ElementKind::Participant { process_ref: None }, false, 10.0),
         Some((300.0, 150.0))
     );
     assert_eq!(
-        min_size(&ElementKind::TextAnnotation { text: None }, false),
+        min_size(&ElementKind::TextAnnotation { text: None }, false, 10.0),
         Some((50.0, 30.0))
     );
 
@@ -428,7 +453,7 @@ fn resize_rules_and_min_sizes() {
     node(&mut defs, "sub", sub, "p", b(0.0, 700.0, 350.0, 200.0));
     defs.plane_mut().shapes.last_mut().unwrap().is_expanded = Some(true);
 
-    let left_drag = resize(&defs, &"sub".into(), b(300.0, 700.0, 50.0, 200.0)).unwrap();
+    let left_drag = resize(&defs, &"sub".into(), b(300.0, 700.0, 50.0, 200.0), 10.0).unwrap();
     run(&mut defs, left_drag);
     assert_eq!(bounds(&defs, "sub"), b(210.0, 700.0, 140.0, 200.0));
 }
@@ -450,7 +475,7 @@ fn resize_keeps_children_inside() {
         b(150.0, 750.0, 100.0, 80.0),
     );
 
-    let command = resize(&defs, &"sub".into(), b(0.0, 700.0, 150.0, 150.0)).unwrap();
+    let command = resize(&defs, &"sub".into(), b(0.0, 700.0, 150.0, 150.0), 10.0).unwrap();
     command.execute(&mut defs).unwrap();
     assert_eq!(bounds(&defs, "sub"), b(0.0, 700.0, 270.0, 150.0));
 }
@@ -460,17 +485,17 @@ fn resize_keeps_children_inside() {
 fn resize_redistributes_lanes() {
     let mut defs = lanes();
 
-    let pool = resize(&defs, &"a".into(), b(0.0, 0.0, 600.0, 300.0)).unwrap();
+    let pool = resize(&defs, &"a".into(), b(0.0, 0.0, 600.0, 300.0), 10.0).unwrap();
     run(&mut defs, pool);
     assert_eq!(bounds(&defs, "l1"), b(30.0, 0.0, 570.0, 125.0));
     assert_eq!(bounds(&defs, "l2"), b(30.0, 125.0, 570.0, 175.0));
 
-    let lane = resize(&defs, &"l1".into(), b(30.0, 0.0, 570.0, 145.0)).unwrap();
+    let lane = resize(&defs, &"l1".into(), b(30.0, 0.0, 570.0, 145.0), 10.0).unwrap();
     run(&mut defs, lane);
     assert_eq!(bounds(&defs, "l2"), b(30.0, 145.0, 570.0, 155.0));
     assert_eq!(bounds(&defs, "a"), b(0.0, 0.0, 600.0, 300.0));
 
-    let wide = resize(&defs, &"l1".into(), b(30.0, 0.0, 670.0, 145.0)).unwrap();
+    let wide = resize(&defs, &"l1".into(), b(30.0, 0.0, 670.0, 145.0), 10.0).unwrap();
     wide.execute(&mut defs).unwrap();
     assert_eq!(bounds(&defs, "a").w, 700.0);
     assert_eq!(bounds(&defs, "l2").w, 670.0);

@@ -1,6 +1,7 @@
 //! `Command`: the editing operations of the modeler, after bpmn-js
 //! `CommandStack` handlers (`shape.move`, `shape.create`, ...).
 
+use super::docking::apply as apply_slots;
 use super::label::{flow_label_bounds, has_external_label, shape_label_bounds};
 use super::lanes::{close_lane_gap, lane_slot, update_flow_node_refs};
 use super::layout::{orthogonalize, repair_end, route};
@@ -124,8 +125,26 @@ pub enum Command {
 }
 
 impl Command {
-    /// Applies the command to `defs`; returns `None` when nothing changed.
+    /// Applies the command to `defs`, then moves every docking point to its
+    /// slot (`docking::apply`) in the same undoable step; returns `None`
+    /// when nothing changed.
     pub fn execute(&self, defs: &mut Definitions) -> Option<Undo> {
+        let applied = self.apply(defs)?;
+        let mut slots = Undo::default();
+        apply_slots(defs, &mut slots);
+        if slots.is_empty() {
+            return Some(applied);
+        }
+
+        let mut undo = Undo::default();
+        undo.step(applied);
+        undo.step(slots);
+        Some(undo)
+    }
+
+    /// Applies the command alone, without slot distribution; compound
+    /// sub-commands go through here so slots are distributed once.
+    fn apply(&self, defs: &mut Definitions) -> Option<Undo> {
         let mut undo = Undo::default();
 
         match self {
@@ -346,7 +365,7 @@ impl Command {
 
             Command::Compound(commands) => {
                 for command in commands {
-                    if let Some(step) = command.execute(defs) {
+                    if let Some(step) = command.apply(defs) {
                         undo.step(step);
                     }
                 }

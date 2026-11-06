@@ -7,6 +7,7 @@ pub fn open(path: &Path) -> Result<Definitions, String> {
     let mut defs = crate::io::load(path)?;
     crate::modeling::compat_planes(&mut defs);
     crate::modeling::layout::orthogonalize_all(&mut defs);
+    crate::modeling::docking::distribute_all(&mut defs);
     Ok(defs)
 }
 

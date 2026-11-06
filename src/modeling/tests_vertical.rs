@@ -292,9 +292,10 @@ fn docked_flow(defs: &mut Definitions) {
     });
 }
 
-/// Reconnecting the target keeps the source docking point.
+/// Reconnecting the target keeps the source side, but docking slots win over
+/// `preserveDocking`: the lone source end moves to its side middle.
 #[test]
-fn reconnect_keeps_the_other_docking() {
+fn reconnect_keeps_the_other_side_in_its_slot() {
     let mut defs = Definitions::default();
     defs.plane_mut().element_id = Some("p".into());
     defs.add_element(Element::new("p", ElementKind::Process));
@@ -318,14 +319,15 @@ fn reconnect_keeps_the_other_docking() {
         .expect("changed");
 
     let route = defs.edges().next().expect("edge").waypoints.clone();
-    assert_eq!(route.first(), Some(&pt(100.0, 20.0)), "{route:?}");
+    assert_eq!(route.first(), Some(&pt(100.0, 40.0)), "{route:?}");
     assert_eq!(route.last(), Some(&pt(300.0, 340.0)), "{route:?}");
     assert_ortho(&route);
 }
 
-/// Moving the target of a bendless flow keeps the source docking point.
+/// Moving the target of a bendless flow keeps the source side; the lone
+/// source end sits in its slot (side middle), not at its old point.
 #[test]
-fn move_keeps_the_other_docking() {
+fn move_keeps_the_other_side_in_its_slot() {
     let mut defs = vertical_pool();
     defs.remove_element(&"pool".into());
     defs.add_element(Element::new(
@@ -352,6 +354,6 @@ fn move_keeps_the_other_docking() {
     .expect("moved");
 
     let route = defs.edges().next().expect("edge").waypoints.clone();
-    assert_eq!(route.first(), Some(&pt(100.0, 20.0)), "{route:?}");
+    assert_eq!(route.first(), Some(&pt(100.0, 40.0)), "{route:?}");
     assert_ortho(&route);
 }

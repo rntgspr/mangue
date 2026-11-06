@@ -205,6 +205,45 @@ fn drag_end_reconnects(cx: &mut TestAppContext) {
     assert_ne!(endpoints(&view, cx), other);
 }
 
+/// Dragging the end of the selected flow onto another side of its own
+/// target moves the docking there without reconnecting; undo restores.
+#[gpui::test]
+fn drag_end_along_own_shape_redocks(cx: &mut TestAppContext) {
+    let (view, cx) = open(cx);
+    let flow = bent_flow(&view, cx);
+    let task = match kind_of(&view, cx, &flow) {
+        ElementKind::SequenceFlow { target, .. } => target,
+        _ => panic!("not a flow"),
+    };
+    let before = waypoints_of(&view, cx, &flow);
+    let tb = bounds_of(&view, cx, &task);
+    select_edge(&view, cx, &flow);
+
+    let end = *before.last().unwrap();
+    let below = Waypoint {
+        x: tb.x + tb.w / 2.,
+        y: tb.y + tb.h - 2.,
+    };
+    drag(cx, win(end), win(below));
+
+    let after = waypoints_of(&view, cx, &flow);
+    assert_eq!(
+        after.last(),
+        Some(&Waypoint {
+            x: tb.x + tb.w / 2.,
+            y: tb.y + tb.h,
+        }),
+        "{after:?}"
+    );
+    match kind_of(&view, cx, &flow) {
+        ElementKind::SequenceFlow { target, .. } => assert_eq!(target, task),
+        _ => panic!("not a flow"),
+    }
+
+    cx.simulate_keystrokes("secondary-z");
+    assert_eq!(waypoints_of(&view, cx, &flow), before);
+}
+
 /// Dragging a named event's external label moves only the label.
 #[gpui::test]
 fn drag_label_moves_label_only(cx: &mut TestAppContext) {

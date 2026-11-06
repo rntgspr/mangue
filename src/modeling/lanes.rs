@@ -150,7 +150,8 @@ pub fn split_lane(defs: &Definitions, target: &ElementId, count: usize) -> Optio
 /// move stays put). Participants and lanes also resize the lanes sharing
 /// the moved edges (bpmn-js `computeLanesResize`) and recompute lane
 /// membership; `None` when that would shrink a lane below its minimum.
-pub fn resize(defs: &Definitions, id: &ElementId, bounds: Bounds) -> Option<Command> {
+/// `grid` is the dot grid spacing that task minimums are counted in.
+pub fn resize(defs: &Definitions, id: &ElementId, bounds: Bounds, grid: f64) -> Option<Command> {
     let element = defs.get(id)?;
     let shape = defs.shape(id)?;
     let expanded = shape.is_expanded == Some(true);
@@ -159,7 +160,7 @@ pub fn resize(defs: &Definitions, id: &ElementId, bounds: Bounds) -> Option<Comm
     }
 
     let old = shape.bounds;
-    let (min_w, min_h) = min_size(&element.kind, expanded)?;
+    let (min_w, min_h) = min_size(&element.kind, expanded, grid)?;
     let mut new = clamp_size(&old, bounds, min_w, min_h);
     if let Some(children) = children_box(defs, id) {
         new = contain(&old, new, &children);

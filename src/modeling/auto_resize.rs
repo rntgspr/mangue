@@ -8,6 +8,9 @@ use super::Command;
 use super::lanes;
 use crate::model::{Bounds, Definitions, ElementId, ElementKind};
 
+/// Grid passed to `lanes::resize`; containers have fixed minimums, only tasks use it.
+const CONTAINER_GRID: f64 = 10.0;
+
 /// Minimum distance kept between content and container border (diagram-js
 /// `AutoResize.getPadding`): top, right, bottom, left.
 const PADDING: [f64; 4] = [2.0, 15.0, 2.0, 15.0];
@@ -88,7 +91,10 @@ fn grow(defs: &Definitions, ids: &[ElementId]) -> Vec<(ElementId, Command)> {
                 return None;
             }
 
-            Some((container.clone(), lanes::resize(defs, &container, bounds)?))
+            Some((
+                container.clone(),
+                lanes::resize(defs, &container, bounds, CONTAINER_GRID)?,
+            ))
         })
         .collect()
 }

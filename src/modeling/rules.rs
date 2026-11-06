@@ -225,12 +225,24 @@ pub fn boundary_side(point: Waypoint, host: &Bounds) -> Option<(i8, i8)> {
     (dx != 0 || dy != 0).then_some((dx, dy))
 }
 
+/// Minimum task width and height, in grid cells (the dot grid spacing).
+pub const TASK_MIN_GRIDS: f64 = 6.0;
+
 /// Whether the shape of `kind` may be resized (bpmn-js `BpmnRules.canResize`):
-/// expanded sub-processes, participants, lanes, text annotations and groups.
+/// expanded sub-processes, participants, lanes, text annotations, groups and,
+/// as a mangue addition, tasks.
 pub fn can_resize(kind: &ElementKind, expanded: bool) -> bool {
     match kind {
         ElementKind::SubProcess { .. } => expanded,
-        ElementKind::Participant { .. }
+        ElementKind::Task
+        | ElementKind::UserTask
+        | ElementKind::ServiceTask
+        | ElementKind::ScriptTask
+        | ElementKind::SendTask
+        | ElementKind::ReceiveTask
+        | ElementKind::ManualTask
+        | ElementKind::BusinessRuleTask
+        | ElementKind::Participant { .. }
         | ElementKind::Lane
         | ElementKind::TextAnnotation { .. }
         | ElementKind::Group => true,
@@ -240,8 +252,9 @@ pub fn can_resize(kind: &ElementKind, expanded: bool) -> bool {
 
 /// Minimum `(width, height)` of a resized shape (bpmn-js `ResizeBehavior`):
 /// sub-process and group 140x120, participant 300x150, lane 300x60, text
-/// annotation 50x30; `None` when the kind is not resizable.
-pub fn min_size(kind: &ElementKind, expanded: bool) -> Option<(f64, f64)> {
+/// annotation 50x30, task `TASK_MIN_GRIDS` cells of `grid` units square;
+/// `None` when the kind is not resizable.
+pub fn min_size(kind: &ElementKind, expanded: bool, grid: f64) -> Option<(f64, f64)> {
     if !can_resize(kind, expanded) {
         return None;
     }
@@ -250,7 +263,8 @@ pub fn min_size(kind: &ElementKind, expanded: bool) -> Option<(f64, f64)> {
         ElementKind::Participant { .. } => (300.0, 150.0),
         ElementKind::Lane => (300.0, 60.0),
         ElementKind::TextAnnotation { .. } => (50.0, 30.0),
-        _ => (140.0, 120.0),
+        ElementKind::SubProcess { .. } | ElementKind::Group => (140.0, 120.0),
+        _ => (TASK_MIN_GRIDS * grid, TASK_MIN_GRIDS * grid),
     })
 }
 

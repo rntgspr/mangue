@@ -7,6 +7,7 @@ pub mod attach;
 pub mod auto_resize;
 pub mod clipboard;
 mod command;
+pub mod docking;
 pub mod factory;
 pub mod label;
 pub mod lanes;
@@ -24,6 +25,9 @@ mod tests;
 
 #[cfg(test)]
 mod tests_arrange;
+
+#[cfg(test)]
+mod tests_docking;
 
 #[cfg(test)]
 mod tests_factory;

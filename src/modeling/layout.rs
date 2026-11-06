@@ -512,7 +512,7 @@ pub fn preferred(source: &Bounds, target: &Bounds, ends: (End, End)) -> Vec<Wayp
 
 /// Side of `b` whose border holds `p`, or `None` when `p` is not on the
 /// border (within `ALIGN_EPS`).
-fn border_side(b: &Bounds, p: Waypoint) -> Option<Side> {
+pub(super) fn border_side(b: &Bounds, p: Waypoint) -> Option<Side> {
     let inside = p.x >= b.x - ALIGN_EPS
         && p.x <= b.x + b.w + ALIGN_EPS
         && p.y >= b.y - ALIGN_EPS
@@ -617,6 +617,13 @@ fn join(a: Waypoint, sa: Side, b: Waypoint, sb: Side) -> Option<Vec<Waypoint>> {
     let my = (a.y + b.y) / 2.0;
 
     facing.then(|| vec![a, wp(a.x, my), wp(b.x, my), b])
+}
+
+/// Route from `a` (leaving along side `sa`) to `b` (entered along side
+/// `sb`): the one- or two-bend `join` when the sides allow it, else the
+/// `detour` around both stubs.
+pub(super) fn side_route(a: Waypoint, sa: Side, b: Waypoint, sb: Side) -> Vec<Waypoint> {
+    simplify(&join(a, sa, b, sb).unwrap_or_else(|| detour(a, sa, b, sb)))
 }
 
 /// Route that leaves `a` and enters `b` by `LOOP_GAP` along their side
