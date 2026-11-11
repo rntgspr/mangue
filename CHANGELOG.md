@@ -6,6 +6,16 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.2]
+
+### Added
+
+- Connection docking slots in the modeling layer.
+
+### Changed
+
+- Visual refinements for tabs, header, breadcrumbs and the code view.
+
 ## [0.1.1]
 
 ### Added
