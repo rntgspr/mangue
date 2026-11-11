@@ -5,3 +5,5 @@
 .agents/
 /AGENTS.md
 /CLAUDE.md
+# Cumaru local cache (context vectors); comment out the next line to version it.
+.cumaru/.cache/
