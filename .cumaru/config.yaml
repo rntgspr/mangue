@@ -31,4 +31,13 @@ root:
   exploring:
     framework: true
     "*": {optional: true, frontmatter: {status: {}, summary: {}, targets: {}}}
-meta: {targets: {values: [platform, meta]}, specification_dir: specs, coverage: {source: []}}
+meta:
+  targets:
+    values: [platform, meta]
+  specification_dir: specs
+  coverage:
+    source: ["src/*"]
+  context:
+    framework: [disciplines, roles, templates]
+    adopter: [specs, plans, exploring]
+    source: [src]
